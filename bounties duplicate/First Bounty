@@ -1,0 +1,19 @@
+Vulnerability Details
+Type: Insufficient Session Expiration / Improper Session Invalidation
+CWE: CWE-613 (Insufficient Session Expiration)
+Affected endpoint(s): [account details page URL] and [cart/add-to-cart endpoint URL]
+Steps to Reproduce
+Create an account on bose.com (Account A).
+Log in to Account A in a browser.
+Open Burp Suite, enable Intercept, and capture an authenticated request to the account details page (e.g., GET [target.com]) containing the session cookie.
+Send this request to Burp Repeater.
+In the browser, click Logout on bose.com. Confirm the UI redirects to the login page / shows a logged-out state.
+Return to Burp Repeater. Without modifying the previously captured session cookie, click Send again on the same request.
+Observed result: The response still returns Account A's full authenticated data (name, email, address, saved card details), as if the session were still active — despite having logged out in step 5.
+Additionally tested the add-to-cart endpoint (Target.com) the same way — cart modification also succeeded using the "logged out" cookie.
+All submissions are subject to the Bose Privacy Policy
+Impact
+A session token captured before logout remains permanently (or indefinitely) usable.
+Anyone who obtains a victim's cookie (public/shared computer, browser history sync, stolen device, network-level capture, malicious browser extension, etc.) retains full access to the account even after the victim logs out believing they are safe.
+Exposed data includes PII (name, email, address) and payment method details, plus the ability to modify cart contents.
+This defeats the entire security purpose of the "Logout" feature.
